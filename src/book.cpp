@@ -31,7 +31,7 @@ void Book<Instruments>::thread_root()
         if (instrs.size() > Instruments)
         {
             instrs.erase(instr);
-            printf("too many instruments");
+            LOG("too many instruments");
             continue;
         }
 
