@@ -361,6 +361,7 @@ inline constexpr unsigned char input_data_binary[] = {
     0x00,
 };
 
+// HACK/have a stop mark.. :)
 inline constexpr uint32_t stop_instrument = 1000u;
 inline PacketIngest stop_packet{stop_instrument, 1u, 0u, 0u, 0u, 0, 0u, 0u};
 

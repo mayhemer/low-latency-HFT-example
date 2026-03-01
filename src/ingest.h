@@ -33,7 +33,6 @@ public:
     Ingest(Book<Instruments>::SPSC &bq);
 
     void feed(PacketIngest const *p); // always expect full 32 bytes... for simplicity
-
 };
 
 #endif

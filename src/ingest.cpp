@@ -2,9 +2,10 @@
 #include <cstring>
 
 template <size_t BackBufferSize, size_t Instruments>
-Ingest<BackBufferSize, Instruments>::Ingest(Book<Instruments>::SPSC &bq) : book_queue(bq)
+Ingest<BackBufferSize, Instruments>::Ingest(Book<Instruments>::SPSC &bq)
+    : seqs(Instruments + 1)
+    , book_queue(bq)
 {
-    seqs.reserve(Instruments + 1);
 }
 
 template <size_t BackBufferSize, size_t Instruments>
@@ -13,7 +14,8 @@ void Ingest<BackBufferSize, Instruments>::feed(PacketIngest const *p)
     uint32_t instr = p->instrument_id;
 
     auto pair = seqs.try_emplace(instr, seqs.size(), back_buffer_);
-    if (seqs.size() > Instruments) {
+    if (seqs.size() > Instruments)
+    {
         seqs.erase(instr);
         printf("too many instrs\n");
         return;

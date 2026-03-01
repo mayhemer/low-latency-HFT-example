@@ -33,5 +33,8 @@ int main()
 
     ingest.feed(&stop_packet);
 
+    book.done.wait(false);
+    book.print();
+
     return 0;
 }
