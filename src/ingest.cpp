@@ -17,7 +17,7 @@ void Ingest<BackBufferSize, Instruments>::feed(PacketIngest const *p)
     if (seqs.size() > Instruments)
     {
         seqs.erase(instr);
-        printf("too many instrs");
+        LOG("too many instrs");
         return;
     }
     InstrSeq &seq = pair.first->second;

@@ -30,10 +30,9 @@ int main()
         auto n = rand_u32_0_to_N(sizeof(test_packets) / sizeof(test_packets[0]));
         ingest.feed(test_packets + n);
     }
-
     ingest.feed(&stop_packet);
 
-    book.done.wait(false);
+    book.wait();
     book.print();
 
     return 0;

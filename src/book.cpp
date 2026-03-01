@@ -133,6 +133,12 @@ void Book<Instruments>::thread_root()
 }
 
 template <size_t Instruments>
+void Book<Instruments>::wait()
+{
+    done.wait(false);
+}
+
+template <size_t Instruments>
 void Book<Instruments>::print()
 {
     LOG("\nprinting final status");

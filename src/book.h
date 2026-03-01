@@ -55,6 +55,7 @@ public:
 
     Book();
 
+    void wait();
     void print();
 
 private:
