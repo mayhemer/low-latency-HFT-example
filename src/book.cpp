@@ -44,7 +44,7 @@ void Book<Instruments>::thread_root()
             order_rec.qty += p.qty;
 
             auto &price_map = p.side ? book.price_sell : book.price_buy;
-            PriceOrders &price_orders = price_map.try_emplace(p.price_ticks, p.order_id).first->second;
+            PriceRec &price_orders = price_map.try_emplace(p.price_ticks, p.order_id).first->second;
             price_orders.qty += p.qty;
             if (p.order_id != price_orders.first_order)
             {
@@ -74,7 +74,7 @@ void Book<Instruments>::thread_root()
                 break;
             }
 
-            PriceOrders &price_orders = price_entry->second;
+            PriceRec &price_orders = price_entry->second;
             price_orders.qty -= std::min(p.qty, price_orders.qty);
             // else { vvv } ?
             auto last_order = orders_map.find(price_orders.last_order);
@@ -97,7 +97,7 @@ void Book<Instruments>::thread_root()
                 break;
             }
 
-            PriceOrders &price_orders = price_entry->second;
+            PriceRec &price_orders = price_entry->second;
             price_orders.qty -= std::min(p.qty, price_orders.qty);
             if (!price_orders.qty)
             {

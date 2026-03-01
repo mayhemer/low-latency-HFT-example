@@ -15,7 +15,7 @@ uint32_t rand_u32_0_to_N(uint32_t N)
     // Thread-local engine: fast, avoids contention, seeded once per thread.
     thread_local std::mt19937 rng{std::random_device{}()};
 
-    // Uniform in [0, N] inclusive.
+    // Uniform in <0, N).
     std::uniform_int_distribution<uint32_t> dist(0, N - 1);
     return dist(rng);
 }

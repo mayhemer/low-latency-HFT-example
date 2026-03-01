@@ -13,14 +13,14 @@ void Ingest<BackBufferSize, Instruments>::feed(PacketIngest const *p)
 {
     uint32_t instr = p->instrument_id;
 
-    auto pair = seqs.try_emplace(instr, seqs.size(), back_buffer_);
+    auto instr_entry = seqs.try_emplace(instr, seqs.size(), back_buffer_);
     if (seqs.size() > Instruments)
     {
         seqs.erase(instr);
         LOG("too many instrs");
         return;
     }
-    InstrSeq &seq = pair.first->second;
+    InstrSeq &seq = instr_entry.first->second;
 
     bool const ooo_seq = p->seq_no > seq.next_seq && seq.next_seq;
     bool const dup_seq = p->seq_no < seq.next_seq && seq.next_seq;
@@ -44,7 +44,7 @@ void Ingest<BackBufferSize, Instruments>::feed(PacketIngest const *p)
         return;
     }
 
-    // Received packet In sequence... push it
+    // Received packet in sequence... push it
     book_queue.store(*p);
     seq.next_seq = p->seq_no + 1;
 
