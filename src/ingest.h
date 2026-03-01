@@ -30,7 +30,7 @@ class Ingest
 
 public:
     Ingest() = delete;
-    Ingest(Book<Instruments>::SPSC &bq);
+    Ingest(Book<Instruments> &book);
 
     void feed(PacketIngest const *p); // always expect full 32 bytes... for simplicity
 };

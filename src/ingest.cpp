@@ -2,9 +2,9 @@
 #include <cstring>
 
 template <size_t BackBufferSize, size_t Instruments>
-Ingest<BackBufferSize, Instruments>::Ingest(Book<Instruments>::SPSC &bq)
+Ingest<BackBufferSize, Instruments>::Ingest(Book<Instruments> &book)
     : seqs(Instruments + 1)
-    , book_queue(bq)
+    , book_queue(book.feed)
 {
 }
 

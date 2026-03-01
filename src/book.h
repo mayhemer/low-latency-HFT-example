@@ -15,8 +15,14 @@ template <size_t Instruments>
 class Book
 {
 public:
+    Book();
+
+    void wait();
+    void print();
+
     using SPSC = ring_buffer<PacketIngest, 128>;
 
+private:
     struct OrderRec
     {
         OrderRec(int32_t price) : px(price) {}
@@ -50,17 +56,12 @@ public:
 
     // instrument id -> record
     std::unordered_map<uint32_t, InstrBook> instrs;
+
+    template<size_t, size_t> friend class Ingest;
     SPSC feed;
-    std::atomic_flag done;
 
-    Book();
-
-    void wait();
-    void print();
-
-private:
     std::optional<std::jthread> thread;
-
+    std::atomic_flag done;
     void thread_root();
 };
 
