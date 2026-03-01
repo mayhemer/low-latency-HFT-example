@@ -6,25 +6,25 @@
 // 10 packets in the exact order you originally provided.
 inline constexpr PacketIngest test_packets[] = {
     // 1
-    PacketIngest{ 101u, 1u, 0u, 0u, 0u, 10000, 10u, 1001u },
+    PacketIngest{101u, 1u, 0u, 0u, 0u, 10000, 10u, 1001u},
     // 2
-    PacketIngest{ 101u, 2u, 0u, 1u, 0u, 10005,  7u, 2001u },
+    PacketIngest{101u, 2u, 0u, 1u, 0u, 10005, 7u, 2001u},
     // 3
-    PacketIngest{ 101u, 3u, 0u, 0u, 0u,  9995,  5u, 1002u },
+    PacketIngest{101u, 3u, 0u, 0u, 0u, 9995, 5u, 1002u},
     // 4
-    PacketIngest{ 101u, 4u, 1u, 0u, 0u,     0,  4u, 1001u },
+    PacketIngest{101u, 4u, 1u, 0u, 0u, 0, 4u, 1001u},
     // 5
-    PacketIngest{ 101u, 5u, 2u, 0u, 0u, 10005,  3u,    0u },
+    PacketIngest{101u, 5u, 2u, 0u, 0u, 10005, 3u, 0u},
     // 6
-    PacketIngest{ 202u, 1u, 0u, 1u, 0u,  5000, 20u, 3001u },
+    PacketIngest{202u, 1u, 0u, 1u, 0u, 5000, 20u, 3001u},
     // 7
-    PacketIngest{ 202u, 2u, 0u, 0u, 0u,  4995, 12u, 3002u },
+    PacketIngest{202u, 2u, 0u, 0u, 0u, 4995, 12u, 3002u},
     // 8
-    PacketIngest{ 202u, 3u, 0u, 1u, 0u,  5005, 10u, 4001u },
+    PacketIngest{202u, 3u, 0u, 1u, 0u, 5005, 10u, 4001u},
     // 9
-    PacketIngest{ 202u, 4u, 1u, 0u, 0u,     0, 12u, 3002u },
+    PacketIngest{202u, 4u, 1u, 0u, 0u, 0, 12u, 3002u},
     // 10
-    PacketIngest{ 202u, 5u, 2u, 0u, 0u,  5000,  5u,    0u },
+    PacketIngest{202u, 5u, 2u, 0u, 0u, 5000, 5u, 0u},
 };
 
 // 10 packets × 32 bytes = 320 bytes total
@@ -361,5 +361,7 @@ inline constexpr unsigned char input_data_binary[] = {
     0x00,
 };
 
+inline constexpr uint32_t stop_instrument = 1000u;
+inline PacketIngest stop_packet{stop_instrument, 1u, 0u, 0u, 0u, 0, 0u, 0u};
 
 #endif

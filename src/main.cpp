@@ -25,10 +25,13 @@ int main()
     Book<5> book;
     Ingest<16, 5> ingest(book.feed);
 
-    for (unsigned int i = 0; i < 1000; ++i) {
+    for (unsigned int i = 0; i < 1000; ++i)
+    {
         auto n = rand_u32_0_to_N(sizeof(test_packets) / sizeof(test_packets[0]));
         ingest.feed(test_packets + n);
     }
+
+    ingest.feed(&stop_packet);
 
     return 0;
 }
