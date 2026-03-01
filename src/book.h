@@ -21,12 +21,15 @@ public:
     {
         OrderRec(int32_t price) : px(price) {}
 
-        uint32_t qty{0};
         uint64_t next_order{0};
-        int32_t px{INT32_MIN};
+        uint32_t qty{0};
+        int32_t px{INT32_MIN}; // to find the price entry in price_* maps to update it
     };
-    
-    struct PriceOrders {
+
+    struct PriceOrders
+    {
+        PriceOrders(uint64_t order) : first_order(order) {}
+
         uint64_t first_order{0};
         uint64_t last_order{0};
         uint32_t qty{0};
@@ -36,19 +39,13 @@ public:
     {
         InstrBook();
 
-        // order_id -> qty,px
+        // order_id -> OrderRec
         std::unordered_map<uint64_t, OrderRec> orders_buy;
         std::unordered_map<uint64_t, OrderRec> orders_sell;
 
-        // price -> qty (TODO: PriceOrder)
-        std::map<int32_t, uint32_t, std::greater<int32_t>> price_buy;
-        std::map<int32_t, uint32_t, std::less<int32_t>> price_sell;
-
-        // TODO: have a FIFO of orders for the TRADE packet
-        // to remove orders
-        // This is optional as those orders are logically fullfilled
-        // and we will never get updates for them.  Only issue: we will
-        // leak memory for those orders...
+        // price -> PriceOrder
+        std::map<int32_t, PriceOrders> price_buy;
+        std::map<int32_t, PriceOrders> price_sell;
     };
 
     // instrument id -> record

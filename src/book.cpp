@@ -21,11 +21,11 @@ void Book<Instruments>::thread_root()
         uint32_t instr = p.instrument_id;
         if (instr == stop_instrument)
         {
-            LOG("stoppped by stop instrument\n");
+            LOG("stoppped by stop instrument");
             break;
         }
 
-        LOG("instr: %u, seq: %llu\n", p.instrument_id, p.seq_no);
+        LOG("instr: %u, seq: %llu", p.instrument_id, p.seq_no);
 
         InstrBook &book = instrs[instr];
         if (instrs.size() > Instruments)
@@ -39,24 +39,18 @@ void Book<Instruments>::thread_root()
         {
         case 0: // ADD
         {
-            OrderRec &order_rec = (p.side ? book.orders_sell : book.orders_buy)
-                                      .try_emplace(p.order_id, p.price_ticks)
-                                      .first->second;
+            auto &orders_map = (p.side ? book.orders_sell : book.orders_buy);
+            OrderRec &order_rec = orders_map.try_emplace(p.order_id, p.price_ticks).first->second;
             order_rec.qty += p.qty;
 
-            if (p.side)
+            auto &price_map = p.side ? book.price_sell : book.price_buy;
+            PriceOrders &price_orders = price_map.try_emplace(p.price_ticks, p.order_id).first->second;
+            price_orders.qty += p.qty;
+            if (p.order_id != price_orders.first_order)
             {
-                uint32_t &price_qty = book.price_sell
-                                          .try_emplace(p.price_ticks, 0)
-                                          .first->second;
-                price_qty += p.qty;
-            }
-            else
-            {
-                uint32_t &price_qty = book.price_buy
-                                          .try_emplace(p.price_ticks, 0)
-                                          .first->second;
-                price_qty += p.qty;
+                auto last_order = orders_map.find(price_orders.last_order);
+                last_order->second.next_order = p.order_id;
+                price_orders.last_order = p.order_id;
             }
 
             break;
@@ -73,49 +67,63 @@ void Book<Instruments>::thread_root()
             OrderRec &order_rec = iter->second;
             order_rec.qty -= std::min(p.qty, order_rec.qty);
 
-            if (p.side)
+            auto &price_map = p.side ? book.price_sell : book.price_buy;
+            auto price_entry = price_map.find(p.price_ticks);
+            if (price_entry == price_map.end())
             {
-                uint32_t &price_qty = book.price_sell.try_emplace(order_rec.px, 0).first->second;
-                price_qty -= std::min(p.qty, price_qty);
-                if (!price_qty)
-                {
-                    book.price_sell.erase(order_rec.px);
-                }
+                break;
             }
-            else
+
+            PriceOrders &price_orders = price_entry->second;
+            price_orders.qty -= std::min(p.qty, price_orders.qty);
+            if (!price_orders.qty)
             {
-                uint32_t &price_qty = book.price_buy.try_emplace(order_rec.px, 0).first->second;
-                price_qty -= std::min(p.qty, price_qty);
-                if (!price_qty)
-                {
-                    book.price_buy.erase(order_rec.px);
-                }
+                price_map.erase(order_rec.px);
             }
+
+            // else { vvv } ?
+            auto last_order = orders_map.find(price_orders.last_order);
+            last_order->second.next_order = p.order_id;
+            price_orders.last_order = p.order_id;
 
             break;
         }
         case 2: // TRADE
         {
-            if (p.side)
+            // probably backwards...
+            auto &price_map = p.side ? book.price_buy : book.price_sell;
+            auto price_entry = price_map.find(p.price_ticks);
+            if (price_entry == price_map.end())
             {
-                uint32_t &price_qty = book.price_sell.try_emplace(p.price_ticks, 0).first->second;
-                price_qty -= std::min(p.qty, price_qty);
-                if (!price_qty)
-                {
-                    book.price_sell.erase(p.price_ticks);
-                }
-            }
-            else
-            {
-                uint32_t &price_qty = book.price_buy.try_emplace(p.price_ticks, 0).first->second;
-                price_qty -= std::min(p.qty, price_qty);
-                if (!price_qty)
-                {
-                    book.price_buy.erase(p.price_ticks);
-                }
+                break;
             }
 
-            // TODO: update when we have an order FIFO
+            PriceOrders &price_orders = price_entry->second;
+            price_orders.qty -= std::min(p.qty, price_orders.qty);
+            if (!price_orders.qty)
+            {
+                price_map.erase(p.price_ticks);
+            }
+
+            auto &orders_map = (p.side ? book.orders_sell : book.orders_buy);
+
+            uint32_t qty = p.qty;
+            while (qty)
+            {
+                auto order_entry = orders_map.find(price_orders.first_order);
+                if (order_entry == orders_map.end())
+                {
+                    break;
+                }
+
+                OrderRec &order_rec = order_entry->second;
+                uint32_t sub = std::min(order_rec.qty, qty);
+                order_rec.qty -= sub;
+                qty -= sub;
+
+                price_orders.first_order = order_rec.qty ? order_entry->first : order_rec.next_order;
+            }
+
             break;
         }
         }
@@ -128,31 +136,29 @@ void Book<Instruments>::thread_root()
 template <size_t Instruments>
 void Book<Instruments>::print()
 {
-
-    // log result
-    LOG("\nprinting final status\n");
+    LOG("\nprinting final status");
     for (auto instr = instrs.cbegin(); instr != instrs.cend(); ++instr)
     {
         InstrBook const &book = instr->second;
-        LOG("instrument: %u\n", instr->first);
+        LOG("instrument: %u", instr->first);
         auto ask = book.price_sell.cbegin();
-        auto bid = book.price_buy.cbegin();
+        auto bid = book.price_buy.crbegin();
         bool has_ask = ask != book.price_sell.cend();
-        bool has_bid = bid != book.price_buy.cend();
+        bool has_bid = bid != book.price_buy.crend();
         int32_t ask_px = has_ask ? ask->first : -1;
-        int32_t ask_qty = has_ask ? ask->second : 0;
+        int32_t ask_qty = has_ask ? ask->second.qty : 0;
         int32_t bid_px = has_bid ? bid->first : -1;
-        int32_t bid_qty = has_bid ? bid->second : 0;
-        LOG("  ask: %d (qty=%u), bid: %d (qty=%u)\n",
+        int32_t bid_qty = has_bid ? bid->second.qty : 0;
+        LOG("  ask: %d (qty=%u), bid: %d (qty=%u)",
             ask_px, ask_qty, bid_px, bid_qty);
 
-        for (auto order = book.orders_buy.cbegin(); order != book.orders_buy.cend(); ++order)
+        for (auto order_entry = book.orders_buy.cbegin(); order_entry != book.orders_buy.cend(); ++order_entry)
         {
-            LOG("   buy order: %llu, qty: %u, px: %d\n", order->first, order->second.qty, order->second.px);
+            LOG("   buy order: %llu, qty: %u, px: %d", order_entry->first, order_entry->second.qty, order_entry->second.px);
         }
-        for (auto order = book.orders_sell.cbegin(); order != book.orders_sell.cend(); ++order)
+        for (auto order_entry = book.orders_sell.cbegin(); order_entry != book.orders_sell.cend(); ++order_entry)
         {
-            LOG("  sell order: %llu, qty: %u, px: %d\n", order->first, order->second.qty, order->second.px);
+            LOG("  sell order: %llu, qty: %u, px: %d", order_entry->first, order_entry->second.qty, order_entry->second.px);
         }
     }
 }
