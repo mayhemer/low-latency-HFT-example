@@ -15,7 +15,7 @@ class Ingest
     struct InstrSeq
     {
         InstrSeq(size_t index, PacketIngest *back_buffer)
-            : next_seq{1}, back_buffer_ref{back_buffer + BackBufferSize * index}
+            : back_buffer_ref{back_buffer + BackBufferSize * index}, next_seq{1}
         {
         }
 

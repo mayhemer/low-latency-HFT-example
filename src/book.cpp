@@ -39,7 +39,7 @@ void Book<Instruments>::thread_root()
         {
         case 0: // ADD
         {
-            auto &orders_map = (p.side ? book.orders_sell : book.orders_buy);
+            auto &orders_map = p.side ? book.orders_sell : book.orders_buy;
             OrderRec &order_rec = orders_map.try_emplace(p.order_id, p.price_ticks).first->second;
             order_rec.qty += p.qty;
 
@@ -57,18 +57,18 @@ void Book<Instruments>::thread_root()
         }
         case 1: // CANCEL
         {
-            auto &orders_map = (p.side ? book.orders_sell : book.orders_buy);
-            auto iter = orders_map.find(p.order_id);
-            if (iter == orders_map.end())
+            auto &orders_map = p.side ? book.orders_sell : book.orders_buy;
+            auto order_entry = orders_map.find(p.order_id);
+            if (order_entry == orders_map.end())
             {
                 break;
             }
 
-            OrderRec &order_rec = iter->second;
+            OrderRec &order_rec = order_entry->second;
             order_rec.qty -= std::min(p.qty, order_rec.qty);
 
             auto &price_map = p.side ? book.price_sell : book.price_buy;
-            auto price_entry = price_map.find(p.price_ticks);
+            auto price_entry = price_map.find(order_rec.px);
             if (price_entry == price_map.end())
             {
                 break;
@@ -76,21 +76,20 @@ void Book<Instruments>::thread_root()
 
             PriceOrders &price_orders = price_entry->second;
             price_orders.qty -= std::min(p.qty, price_orders.qty);
-            if (!price_orders.qty)
-            {
-                price_map.erase(order_rec.px);
-            }
-
             // else { vvv } ?
             auto last_order = orders_map.find(price_orders.last_order);
             last_order->second.next_order = p.order_id;
             price_orders.last_order = p.order_id;
 
+            if (!price_orders.qty)
+            {
+                price_map.erase(order_rec.px);
+            }
+
             break;
         }
         case 2: // TRADE
         {
-            // probably backwards...
             auto &price_map = p.side ? book.price_buy : book.price_sell;
             auto price_entry = price_map.find(p.price_ticks);
             if (price_entry == price_map.end())
@@ -105,7 +104,7 @@ void Book<Instruments>::thread_root()
                 price_map.erase(p.price_ticks);
             }
 
-            auto &orders_map = (p.side ? book.orders_sell : book.orders_buy);
+            auto &orders_map = p.side ? book.orders_buy : book.orders_sell;
 
             uint32_t qty = p.qty;
             while (qty)

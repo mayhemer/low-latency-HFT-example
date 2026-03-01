@@ -19,7 +19,7 @@ struct ring_buffer
     {
         size_t w = write.load(std::memory_order_relaxed);
         // just override...
-        size_t w_next = w + 1 & (N - 1);
+        size_t w_next = (w + 1) & (N - 1);
         buffer[w] = item;
         write.store(w_next, std::memory_order_release);
     }
@@ -31,7 +31,7 @@ struct ring_buffer
         }
 
         item = buffer[read];
-        read = read + 1 & (N - 1);
+        read = (read + 1) & (N - 1);
     }
 };
 

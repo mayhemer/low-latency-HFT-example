@@ -28,7 +28,7 @@ public:
 
     struct PriceOrders
     {
-        PriceOrders(uint64_t order) : first_order(order) {}
+        PriceOrders(uint64_t order) : first_order(order), last_order(order) {}
 
         uint64_t first_order{0};
         uint64_t last_order{0};
