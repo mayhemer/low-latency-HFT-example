@@ -1,5 +1,7 @@
 # Initial task
 
+https://chatgpt.com/share/69a4c083-b44c-800d-b425-a448d2d1e0aa
+
 Here’s an **8-hour C++ (C++20/C++23) HFT (High-Frequency Trading)**-style coding test you can realistically finish in one day. It’s designed to hit the exact interview surface area: **latency-aware design, concurrency, lock-free/lock-light data structures, correctness, and observability**.
 
 ---
@@ -410,7 +412,7 @@ ASK = SELL for the lowest price
     - reads the top book state
     - sends back ACK and maybe FILL when met by the top of the book
 
-Test input for the Ingest:
+Test input for the Ingest (LE):
 
 A1: 65000000010000000000000000000000102700000a000000e903000000000000
 A2: 650000000200000000000000000100001527000007000000d107000000000000
@@ -423,13 +425,16 @@ B3: ca0000000300000000000000000100008d1300000a000000a10f000000000000
 B4: ca000000040000000000000001000000000000000c000000ba0b000000000000
 B5: ca00000005000000000000000200000088130000050000000000000000000000
 
-Expected in-order output after recovery (per instrument)
-Instrument 101
 
-Final emitted sequence (deduped, ordered):
-A1, A2, A3, A4, A5
+Final book results:
+instrument: 101
+  ask: 10005 (qty=4), bid: 10000 (qty=6)
+   buy order: 1002, qty: 5, px: 9995
+   buy order: 1001, qty: 6, px: 10000
+  sell order: 2001, qty: 4, px: 10005
+instrument: 202
+  ask: 5000 (qty=15), bid: -1 (qty=0)
+   buy order: 3002, qty: 0, px: 4995
+  sell order: 4001, qty: 10, px: 5005
+  sell order: 3001, qty: 15, px: 5000
 
-Instrument 202
-
-Final emitted sequence (deduped, ordered):
-B1, B2, B3, B4, B5
