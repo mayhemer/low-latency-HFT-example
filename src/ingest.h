@@ -10,7 +10,11 @@
 template <size_t BackBufferSize, size_t Instruments>
 class Ingest
 {
-    static_assert((BackBufferSize & (BackBufferSize - 1)) == 0);
+    static constexpr ptrdiff_t buffer_size_signed = BackBufferSize;
+    static constexpr size_t buffer_size_mask = BackBufferSize - 1UZ;
+
+    static_assert((BackBufferSize & buffer_size_mask) == 0);
+    static_assert(BackBufferSize <= PTRDIFF_MAX);
 
     struct InstrSeq
     {
