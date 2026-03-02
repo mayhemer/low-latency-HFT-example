@@ -7,7 +7,7 @@
 #include "utl.h"
 #include "book.h"
 
-template <size_t BackBufferSize, size_t Instruments, typename SPSC = ring_buffer<PacketIngest, 128>>
+template <size_t BackBufferSize, size_t Instruments, typename SPSC>
 class Ingest
 {
     static constexpr ptrdiff_t buffer_size_signed = BackBufferSize;

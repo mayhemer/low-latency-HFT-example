@@ -83,4 +83,6 @@ void Ingest<BackBufferSize, Instruments, SPSC>::feed(PacketIngest const *incomin
     }
 }
 
-template class Ingest<16, 5>;
+template class Ingest<16, 5, SPSC_fallible>;
+template class Ingest<16, 5, SPSC_overwrite_seq>;
+template class Ingest<16, 5, SPSC_overwrite_alt>;

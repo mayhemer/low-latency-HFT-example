@@ -22,8 +22,9 @@ uint32_t rand_u32_0_to_N(uint32_t N)
 
 int main()
 {
-    Book<5> book;
-    Ingest<16, 5> ingest(book.feed);
+    using SPSC = SPSC_overwrite_alt;
+    Book<5, SPSC> book;
+    Ingest<16, 5, SPSC> ingest(book.feed);
 
     for (unsigned int i = 0; i < 200; ++i)
     {
