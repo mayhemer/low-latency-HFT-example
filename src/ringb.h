@@ -116,44 +116,39 @@ struct ring_buffer_overwriting : public ring_debugger
 
     constexpr bool store(T const &item)
     {
-        for (;;)
+        size_t r = read.load(std::memory_order_acquire);
+        size_t w = write.load(std::memory_order_relaxed);
+
+        size_t w_next = (w + 1) & mask;
+        while (w_next == r && !read.compare_exchange_weak(r, (r + 1) & mask,
+                                                          std::memory_order_release,
+                                                          std::memory_order_acquire))
         {
-            size_t r = read.load(std::memory_order_acquire);
-            size_t w = write.load(std::memory_order_relaxed);
-
-            size_t w_next = (w + 1) & mask;
-            if (w_next == r && !read.compare_exchange_weak(r, (r + 1) & mask,
-                                                           std::memory_order_release,
-                                                           std::memory_order_acquire))
-            {
-                continue;
-            }
-
-            buffer[w] = item;
-
-            _debug_wait_sync_store();
-
-            write.store(w_next, std::memory_order_release);
-#if SYNC_WITH_WAIT
-            write.notify_one();
-#endif
-            break;
         }
+
+        buffer[w] = item;
+
+        _debug_wait_sync_store();
+
+        write.store(w_next, std::memory_order_release);
+#if SYNC_WITH_WAIT
+        write.notify_one();
+#endif
 
         return true;
     }
 
     void load(T &item)
     {
-        size_t r;
+        size_t r = read.load(std::memory_order_acquire);
         do
         {
-            r = read.load(std::memory_order_acquire);
 #if SYNC_WITH_WAIT
             write.wait(r, std::memory_order_acquire);
 #else
             while (r == write.load(std::memory_order_acquire))
-                ;
+            {
+            }
 #endif
             item = buffer[r];
 
