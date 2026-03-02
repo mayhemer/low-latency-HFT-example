@@ -22,7 +22,7 @@ uint32_t rand_u32_0_to_N(uint32_t N)
 
 int main()
 {
-    using SPSC = SPSC_overwrite_alt;
+    using SPSC = SPSC_overwrite;
     Book<5, SPSC> book;
     Ingest<16, 5, SPSC> ingest(book.feed);
 

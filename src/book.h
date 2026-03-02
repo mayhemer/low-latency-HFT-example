@@ -12,8 +12,7 @@
 #include "packet.h"
 
 using SPSC_fallible = ring_buffer_fallible<PacketIngest, 128>;
-using SPSC_overwrite_seq = ring_buffer_overwriting_seq<PacketIngest, 128>;
-using SPSC_overwrite_alt = ring_buffer_overwriting_alter<PacketIngest, 128>;
+using SPSC_overwrite = ring_buffer_overwriting<PacketIngest, 128>;
 
 template <size_t Instruments, typename SPSC>
 class Book

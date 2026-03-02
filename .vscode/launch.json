@@ -5,10 +5,22 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "(lldb) Spustit",
+            "name": "HFT1",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/out/build/GCC 15.2.0 aarch64-apple-darwin25/HFT1",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb"
+        },
+        {
+            "name": "ringb.test",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/out/build/GCC 15.2.0 aarch64-apple-darwin25/Test_Ring",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",

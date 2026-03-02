@@ -169,5 +169,4 @@ void Book<Instruments, SPSC>::print()
 }
 
 template class Book<5, SPSC_fallible>;
-template class Book<5, SPSC_overwrite_alt>;
-template class Book<5, SPSC_overwrite_seq>;
+template class Book<5, SPSC_overwrite>;

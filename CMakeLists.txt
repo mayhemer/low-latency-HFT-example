@@ -7,8 +7,14 @@ add_executable(HFT1
     src/main.cpp
 )
 
+add_executable(Test_Ring
+    src/ringb.test.cpp
+)
+
 set_property(TARGET HFT1 PROPERTY CXX_STANDARD 23)
 set_property(TARGET HFT1 PROPERTY C_EXTENSIONS NO)
+set_property(TARGET Test_Ring PROPERTY CXX_STANDARD 23)
+set_property(TARGET Test_Ring PROPERTY C_EXTENSIONS NO)
 
 # Warnings (portable set; GCC/Clang)
 if (CMAKE_C_COMPILER_ID MATCHES "GNU|Clang|AppleClang")
