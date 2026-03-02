@@ -23,9 +23,9 @@ uint32_t rand_u32_0_to_N(uint32_t N)
 int main()
 {
     Book<5> book;
-    Ingest<16, 5> ingest(book);
+    Ingest<16, 5> ingest(book.feed);
 
-    for (unsigned int i = 0; i < 1000; ++i)
+    for (unsigned int i = 0; i < 200; ++i)
     {
         auto n = rand_u32_0_to_N(sizeof(test_packets) / sizeof(test_packets[0]));
         ingest.feed(test_packets + n);

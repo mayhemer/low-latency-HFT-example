@@ -7,7 +7,7 @@
 #include "utl.h"
 #include "book.h"
 
-template <size_t BackBufferSize, size_t Instruments>
+template <size_t BackBufferSize, size_t Instruments, typename SPSC = ring_buffer<PacketIngest, 128>>
 class Ingest
 {
     static constexpr ptrdiff_t buffer_size_signed = BackBufferSize;
@@ -30,11 +30,11 @@ class Ingest
     std::unordered_map<uint32_t, InstrSeq> seqs;
     alignas(alignof(PacketIngest)) PacketIngest back_buffer_[BackBufferSize * Instruments];
 
-    Book<Instruments>::SPSC &book_queue;
+    SPSC &book_queue;
 
 public:
     Ingest() = delete;
-    Ingest(Book<Instruments> &book);
+    Ingest(SPSC& spsc);
 
     void feed(PacketIngest const *p); // always expect full 32 bytes... for simplicity
 };

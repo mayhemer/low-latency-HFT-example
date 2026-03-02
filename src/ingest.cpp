@@ -1,14 +1,14 @@
 #include "ingest.h"
 #include <cstring>
 
-template <size_t BackBufferSize, size_t Instruments>
-Ingest<BackBufferSize, Instruments>::Ingest(Book<Instruments> &book)
-    : seqs(Instruments + 1), book_queue(book.feed)
+template <size_t BackBufferSize, size_t Instruments, typename SPSC>
+Ingest<BackBufferSize, Instruments, SPSC>::Ingest(SPSC& spsc)
+    : seqs(Instruments + 1), book_queue(spsc)
 {
 }
 
-template <size_t BackBufferSize, size_t Instruments>
-void Ingest<BackBufferSize, Instruments>::feed(PacketIngest const *incoming)
+template <size_t BackBufferSize, size_t Instruments, typename SPSC>
+void Ingest<BackBufferSize, Instruments, SPSC>::feed(PacketIngest const *incoming)
 {
     uint32_t instr = incoming->instrument_id;
 

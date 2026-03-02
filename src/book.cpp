@@ -2,15 +2,15 @@
 #include "book.h"
 #include "testdata.h"
 
-template <size_t Instruments>
-Book<Instruments>::Book()
+template <size_t Instruments, typename SPSC>
+Book<Instruments, SPSC>::Book()
     : instrs(Instruments + 1)
 {
     thread.emplace(&Book::thread_root, this);
 }
 
-template <size_t Instruments>
-void Book<Instruments>::thread_root()
+template <size_t Instruments, typename SPSC>
+void Book<Instruments, SPSC>::thread_root()
 {
     for (;;)
     {
@@ -132,14 +132,14 @@ void Book<Instruments>::thread_root()
     done.notify_all();
 }
 
-template <size_t Instruments>
-void Book<Instruments>::wait()
+template <size_t Instruments, typename SPSC>
+void Book<Instruments, SPSC>::wait()
 {
     done.wait(false);
 }
 
-template <size_t Instruments>
-void Book<Instruments>::print()
+template <size_t Instruments, typename SPSC>
+void Book<Instruments, SPSC>::print()
 {
     LOG("\nprinting final status");
     for (auto instr = instrs.cbegin(); instr != instrs.cend(); ++instr)
@@ -166,12 +166,6 @@ void Book<Instruments>::print()
             LOG("  sell order: %llu, qty: %u, px: %d", order_entry->first, order_entry->second.qty, order_entry->second.px);
         }
     }
-}
-
-template <size_t Instruments>
-inline Book<Instruments>::InstrBook::InstrBook()
-    : orders_buy(1024), orders_sell(1024)
-{
 }
 
 template class Book<5>;
