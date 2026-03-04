@@ -290,3 +290,5 @@ struct ring_buffer_overwriting_alter : public ring_debugger
 };
 
 */
+
+#endif
