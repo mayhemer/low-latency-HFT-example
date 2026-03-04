@@ -32,4 +32,4 @@ There are following operations supported:
 
 All these operations are updating the book, best ask, and bid.  
 
-For cancellation, we need to track orders for fast access (unordered_map, O(1) add and remove, preallocated).  For trade, we need to keep FIFO of orders (linked list, O(1) updates).  For best ask and bid, we need to keep track of quantities for a price (map - with ordered keys, O(log N) updates [possible bottlenek], min and max for best bid and ask are O(1)).
+For cancellation, we need to track orders for fast access (unordered_map, _O(1)_ add and remove, preallocated).  For trade, we need to keep FIFO of orders (linked list, _O(1)_ updates).  For best ask and bid, we need to keep track of quantities for a price (map - with ordered keys, _O(log N)_ updates [possible bottlenek], min and max for best bid and ask are _O(1)_).
