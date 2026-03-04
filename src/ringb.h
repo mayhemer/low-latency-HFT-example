@@ -161,7 +161,7 @@ struct ring_buffer_overwriting : public ring_debugger
 };
 
 // Following approaches don't work, one sign is that these are too complicated!
-#if 0
+/*
 
 template <typename T, size_t N>
 struct ring_buffer_overwriting_seq : public ring_debugger
@@ -283,12 +283,10 @@ struct ring_buffer_overwriting_alter : public ring_debugger
 
             span = (w2 >> 1) - read;
             read += span > N ? span - N : 0;
-        } while (/* w2 - w1 >= N || */ span > N); // writer overlapped the buffer, possible torn write/read, read cursor must shift
+        } while (w2 - w1 >= N || span > N); // writer overlapped the buffer, possible torn write/read, read cursor must shift
 
         ++read;
     }
 };
 
-#endif
-
-#endif
+*/
