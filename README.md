@@ -1,8 +1,8 @@
 # Overview
 
-This is an example of high-frequency-trading code.  It is only made for aducational purposes and is far from complete.
+This is an example of high-frequency-trading code.  It is only made for educational purposes and is far from complete.
 
-_DISCLAIMER: only lightly tested and definitely not for production use, as-is.  This is just a portfolio item._
+_DISCLAIMER: only lightly tested and definitely not for production use, as-is.  This is just a demo, training item._
 
 Now it only contains three parts that I can claim are working well:
 1. packet ingest for multiple instruments
@@ -13,7 +13,7 @@ Now it only contains three parts that I can claim are working well:
 
 For simplicity, to demo low-latency structures only, it is directly fed with packet structures - no parsing of raw binary data.
 
-It can order incoming packets in a per-instrument sequence when delivered out-of-order.  It handles duplicate packets.  It marsks points in the code to send push back hints and retransmit announcements.
+It can order incoming packets in a per-instrument sequence when delivered out-of-order.  It handles duplicate packets.  It marks points in the code to send push back hints and retransmit announcements.
 
 Note that packet back buffer capacity is static and limited and oldest packets are thrown away when overran.  This may not be a good approach when a single packet is lost forever and we wait to long for a retransmit.
 
